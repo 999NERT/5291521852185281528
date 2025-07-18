@@ -15,6 +15,7 @@ body {
 
 h1, h2, h3 {
     color: #9147ff;
+    margin-top: 0;
 }
 
 h1 {
@@ -32,35 +33,37 @@ h1 {
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
     color: #a970ff;
 }
 
 input, textarea, select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #3a3a3d;
     border-radius: 4px;
     box-sizing: border-box;
     background-color: #1f1f23;
     color: #efeff1;
     font-family: inherit;
+    font-size: 16px;
+    margin-bottom: 5px;
 }
 
 textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 100px;
 }
 
 .requirements-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
     margin-top: 10px;
 }
@@ -69,19 +72,20 @@ textarea {
     background-color: #26262c;
     color: #efeff1;
     border: none;
-    padding: 10px;
+    padding: 12px 8px;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    font-size: 14px;
 }
 
 .req-btn img {
-    margin-right: 5px;
-    width: 16px;
-    height: 16px;
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
 }
 
 .req-btn:hover {
@@ -91,19 +95,21 @@ textarea {
 .req-btn.active {
     background-color: #9147ff;
     color: white;
+    transform: translateY(-2px);
 }
 
 .primary-btn {
     background-color: #9147ff;
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 14px 20px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
     transition: background-color 0.2s;
     width: 100%;
+    margin-top: 10px;
 }
 
 .primary-btn:hover {
@@ -114,11 +120,12 @@ textarea {
     background-color: #3a3a3d;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    margin-right: 10px;
 }
 
 .secondary-btn:hover {
@@ -129,11 +136,11 @@ textarea {
     background-color: #e91916;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .danger-btn:hover {
@@ -142,17 +149,19 @@ textarea {
 
 .tab-container {
     display: flex;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     border-bottom: 1px solid #26262c;
+    padding-bottom: 5px;
 }
 
 .tab {
-    padding: 10px 20px;
+    padding: 12px 20px;
     background-color: #26262c;
     cursor: pointer;
     border-radius: 4px 4px 0 0;
     margin-right: 5px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    font-weight: 500;
 }
 
 .tab:hover {
@@ -175,66 +184,107 @@ textarea {
 .giveaway-item {
     border: 1px solid #26262c;
     border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
     background-color: #1f1f23;
+    transition: all 0.2s;
+}
+
+.giveaway-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .winner {
     font-weight: bold;
     color: #00b5ad;
-    margin-top: 10px;
-    font-size: 1.1em;
+    margin-top: 15px;
+    font-size: 1.2em;
+    padding: 10px;
+    background-color: rgba(0, 181, 173, 0.1);
+    border-radius: 4px;
+    display: inline-block;
 }
 
 .requirements {
-    margin-top: 10px;
-    font-size: 0.9em;
+    margin: 15px 0;
+    font-size: 0.95em;
     color: #adadb8;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .participants-count {
     color: #a970ff;
     font-weight: bold;
+    font-size: 1.1em;
 }
 
 .timer {
     font-size: 1.2em;
     font-weight: bold;
     color: #00b5ad;
-    margin: 5px 0;
+    margin: 10px 0;
 }
 
 .badge-icon {
     vertical-align: middle;
-    margin-right: 5px;
-    width: 16px;
-    height: 16px;
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+}
+
+.command-indicator {
+    display: inline-block;
+    background-color: #9147ff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-left: 5px;
+    font-family: monospace;
 }
 
 small {
     color: #adadb8;
-    font-size: 0.8em;
+    font-size: 0.85em;
+    display: block;
+    margin-top: 5px;
 }
 
 /* Responsywność */
 @media (max-width: 768px) {
+    .app-container {
+        padding: 15px;
+    }
+    
     .requirements-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
     
     .tab {
-        padding: 8px 12px;
+        padding: 10px 15px;
         font-size: 14px;
+    }
+    
+    .giveaway-item {
+        padding: 15px;
     }
 }
 
 @media (max-width: 480px) {
-    .app-container {
-        padding: 10px;
-    }
-    
     .requirements-grid {
         grid-template-columns: 1fr 1fr;
+    }
+    
+    .tab {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    input, textarea, select {
+        padding: 10px;
     }
 }
