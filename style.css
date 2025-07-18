@@ -1,0 +1,240 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0e0e10;
+    color: #efeff1;
+    line-height: 1.6;
+}
+
+.app-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    color: #9147ff;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.container {
+    background-color: #18181b;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    border: 1px solid #26262c;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #a970ff;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #3a3a3d;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #1f1f23;
+    color: #efeff1;
+    font-family: inherit;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.req-btn {
+    background-color: #26262c;
+    color: #efeff1;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.req-btn img {
+    margin-right: 5px;
+    width: 16px;
+    height: 16px;
+}
+
+.req-btn:hover {
+    background-color: #3a3a3d;
+}
+
+.req-btn.active {
+    background-color: #9147ff;
+    color: white;
+}
+
+.primary-btn {
+    background-color: #9147ff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.primary-btn:hover {
+    background-color: #772ce8;
+}
+
+.secondary-btn {
+    background-color: #3a3a3d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.secondary-btn:hover {
+    background-color: #4a4a4d;
+}
+
+.danger-btn {
+    background-color: #e91916;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.danger-btn:hover {
+    background-color: #ff3333;
+}
+
+.tab-container {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #26262c;
+}
+
+.tab {
+    padding: 10px 20px;
+    background-color: #26262c;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    transition: background-color 0.2s;
+}
+
+.tab:hover {
+    background-color: #3a3a3d;
+}
+
+.tab.active {
+    background-color: #9147ff;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.giveaway-item {
+    border: 1px solid #26262c;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #1f1f23;
+}
+
+.winner {
+    font-weight: bold;
+    color: #00b5ad;
+    margin-top: 10px;
+    font-size: 1.1em;
+}
+
+.requirements {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #adadb8;
+}
+
+.participants-count {
+    color: #a970ff;
+    font-weight: bold;
+}
+
+.timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00b5ad;
+    margin: 5px 0;
+}
+
+.badge-icon {
+    vertical-align: middle;
+    margin-right: 5px;
+    width: 16px;
+    height: 16px;
+}
+
+small {
+    color: #adadb8;
+    font-size: 0.8em;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+    .requirements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .tab {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        padding: 10px;
+    }
+    
+    .requirements-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
