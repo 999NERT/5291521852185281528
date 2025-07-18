@@ -1,7 +1,7 @@
 class TwitchGiveaway {
     constructor() {
         this.giveaways = JSON.parse(localStorage.getItem('twitchSubGiveaways')) || [];
-        this.chatInterval = null;
+        this.chatConnection = null;
         this.init();
     }
 
@@ -70,8 +70,7 @@ class TwitchGiveaway {
             endTime: new Date(Date.now() + duration * 60000),
             participants: [],
             winner: null,
-            isActive: true,
-            lastChecked: new Date().getTime()
+            isActive: true
         };
 
         this.giveaways.push(newGiveaway);
@@ -79,56 +78,98 @@ class TwitchGiveaway {
         this.renderGiveaways();
         this.switchTab('active');
         
-        // Uruchomienie monitorowania czatu
-        this.startChatMonitoring(newGiveaway.id);
+        // Połącz z czatem Twitch
+        this.connectToTwitchChat(newGiveaway.id);
         
-        // Automatyczne zakończenie po czasie
-        setTimeout(() => {
-            this.endGiveaway(newGiveaway.id);
-        }, duration * 60000);
-        
+        setTimeout(() => this.endGiveaway(newGiveaway.id), duration * 60000);
         this.resetForm();
     }
 
-    startChatMonitoring(giveawayId) {
-        if (this.chatInterval) clearInterval(this.chatInterval);
+    connectToTwitchChat(giveawayId) {
+        const giveaway = this.giveaways.find(g => g.id === giveawayId);
+        if (!giveaway) return;
+
+        if (this.chatConnection) {
+            this.chatConnection.close();
+        }
+
+        // Użyj WebSocket do połączenia z czatem
+        const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
         
-        this.chatInterval = setInterval(async () => {
-            const giveaway = this.giveaways.find(g => g.id === giveawayId);
-            if (!giveaway || !giveaway.isActive) {
-                clearInterval(this.chatInterval);
+        socket.onopen = () => {
+            socket.send(`CAP REQ :twitch.tv/tags twitch.tv/commands`);
+            socket.send(`PASS oauth:1234567890abcdef1234567890ab`); // Wymaga prawdziwego tokenu
+            socket.send(`NICK justinfan12345`); // Anonimowy dostęp
+            socket.send(`JOIN #${giveaway.channelName}`);
+        };
+
+        socket.onmessage = (event) => {
+            const message = event.data;
+            
+            // Pomijaj pongi
+            if (message.startsWith('PING')) {
+                socket.send('PONG :tmi.twitch.tv');
                 return;
             }
 
-            try {
-                // Pobieranie ostatnich wiadomości przez proxy
-                const response = await fetch(`https://api.ivr.fi/v2/twitch/chat/${giveaway.channelName}`);
-                const chatData = await response.json();
-                
-                // Filtruj tylko nowe wiadomości spełniające wymagania
-                chatData.messages.forEach(msg => {
-                    if (msg.timestamp > giveaway.lastChecked && 
-                        msg.message.toLowerCase() === giveaway.chatCommand) {
-                        
-                        if (!giveaway.participants.includes(msg.user)) {
-                            giveaway.participants.push(msg.user);
-                        }
-                    }
+            // Parsuj wiadomość
+            if (message.includes('PRIVMSG')) {
+                const parts = message.split(';');
+                const tags = {};
+                parts.forEach(part => {
+                    const [key, value] = part.split('=');
+                    tags[key] = value;
                 });
 
-                giveaway.lastChecked = Math.max(...chatData.messages.map(m => m.timestamp), giveaway.lastChecked);
-                this.saveGiveaways();
-                this.renderGiveaways();
+                const userMatch = message.match(/user-type=([^;]*)/);
+                const messageMatch = message.match(/PRIVMSG #[^:]+:(.*)/);
+                
+                if (userMatch && messageMatch) {
+                    const username = tags['display-name'] || message.split('!')[0].slice(1);
+                    const msg = messageMatch[1].trim().toLowerCase();
+                    const isSubscriber = tags['subscriber'] === '1';
+                    const monthsSubscribed = parseInt(tags['badge-info']?.match(/subscriber\/(\d+)/)?.[1]) || 0;
 
-            } catch (error) {
-                console.error('Błąd pobierania czatu:', error);
+                    // Sprawdź wymagania
+                    if (msg === giveaway.chatCommand) {
+                        let qualifies = false;
+                        
+                        switch(giveaway.requirement) {
+                            case 'all': qualifies = true; break;
+                            case '3': qualifies = monthsSubscribed >= 3; break;
+                            case '6': qualifies = monthsSubscribed >= 6; break;
+                            case '9': qualifies = monthsSubscribed >= 9; break;
+                            case '12': qualifies = monthsSubscribed >= 12; break;
+                            case '18': qualifies = monthsSubscribed >= 18; break;
+                            case '24': qualifies = monthsSubscribed >= 24; break;
+                            default: qualifies = isSubscriber;
+                        }
+
+                        if (qualifies && !giveaway.participants.includes(username)) {
+                            giveaway.participants.push(username);
+                            this.saveGiveaways();
+                            this.renderGiveaways();
+                        }
+                    }
+                }
             }
-        }, 5000); // Sprawdzaj co 5 sekund
+        };
+
+        socket.onerror = (error) => {
+            console.error('Błąd połączenia:', error);
+        };
+
+        this.chatConnection = socket;
     }
 
     endGiveaway(giveawayId) {
         const giveaway = this.giveaways.find(g => g.id === giveawayId);
         if (!giveaway) return;
+
+        if (this.chatConnection) {
+            this.chatConnection.close();
+            this.chatConnection = null;
+        }
 
         if (giveaway.participants.length > 0) {
             giveaway.winner = giveaway.participants[
@@ -150,20 +191,17 @@ class TwitchGiveaway {
         this.elements.completedGiveaways.innerHTML = '';
 
         this.giveaways.forEach(giveaway => {
+            const timeLeft = this.getTimeLeft(giveaway);
+            const requirementText = giveaway.requirement === 'all' ? 'Wszyscy' : `Sub ${giveaway.requirement}+`;
+            
             const element = document.createElement('div');
             element.className = 'giveaway-item';
-            
-            const timeLeft = this.getTimeLeft(giveaway);
-            const participantsList = giveaway.participants.length > 0 
-                ? giveaway.participants.slice(-3).join(', ') 
-                : 'Brak uczestników';
-
             element.innerHTML = `
                 <h3>${giveaway.name}</h3>
                 <p>${giveaway.description}</p>
                 <div class="requirements">
-                    Wymagania: ${giveaway.requirement === 'all' ? 'Wszyscy' : `Sub ${giveaway.requirement}+`}
-                    <span class="command-indicator">Komenda: ${giveaway.chatCommand}</span>
+                    Wymagania: ${requirementText}
+                    ${giveaway.chatCommand ? `<span class="command-indicator">Komenda: ${giveaway.chatCommand}</span>` : ''}
                 </div>
                 <p>Kanał: ${giveaway.channelName}</p>
                 <p class="participants-count">Uczestnicy: ${giveaway.participants.length}</p>
@@ -171,22 +209,21 @@ class TwitchGiveaway {
                 ${giveaway.isActive ? `
                     <button class="danger-btn" data-id="${giveaway.id}">Zakończ wcześniej</button>
                     <div class="participant-list">
-                        Ostatni uczestnicy: ${participantsList}
+                        Ostatni uczestnicy: ${giveaway.participants.slice(-3).join(', ') || 'Brak'}
                     </div>
                 ` : `
                     <p>Zakończono: ${new Date(giveaway.endTime).toLocaleString()}</p>
                     ${giveaway.winner ? `<div class="winner">🏆 ${giveaway.winner} 🏆</div>` : ''}
                 `}
             `;
-
+            
             if (giveaway.isActive) {
                 this.elements.activeGiveaways.appendChild(element);
             } else {
                 this.elements.completedGiveaways.appendChild(element);
             }
         });
-
-        // Dodaj event listeners do przycisków
+        
         document.querySelectorAll('.danger-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 if (confirm('Na pewno zakończyć losowanie?')) {
@@ -239,7 +276,6 @@ class TwitchGiveaway {
     }
 }
 
-// Inicjalizacja
 document.addEventListener('DOMContentLoaded', () => {
     new TwitchGiveaway();
 });
