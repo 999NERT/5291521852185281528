@@ -71,7 +71,7 @@ class TwitchGiveaway {
             participants: [],
             winner: null,
             isActive: true,
-            lastMessageTime: 0
+            lastMessageId: 0
         };
 
         this.giveaways.push(newGiveaway);
@@ -103,41 +103,57 @@ class TwitchGiveaway {
         };
 
         socket.onmessage = (event) => {
-            const message = event.data;
+            const rawMessage = event.data;
             
-            if (message.startsWith('PING')) {
+            if (rawMessage.startsWith('PING')) {
                 socket.send('PONG :tmi.twitch.tv');
                 return;
             }
 
-            if (message.includes('PRIVMSG')) {
+            // Nowe, dokładne parsowanie wiadomości
+            if (rawMessage.includes('PRIVMSG')) {
                 try {
-                    const tagsPart = message.substring(1, message.indexOf(' '));
+                    // Parsowanie tagów
+                    const tagsStart = rawMessage.indexOf('@');
+                    const tagsEnd = rawMessage.indexOf(' ');
+                    const tagsStr = rawMessage.substring(tagsStart + 1, tagsEnd);
                     const tags = {};
-                    tagsPart.split(';').forEach(tag => {
+                    tagsStr.split(';').forEach(tag => {
                         const [key, value] = tag.split('=');
                         tags[key] = value;
                     });
 
-                    const messageText = message.split('PRIVMSG #')[1].split(':')[1].trim().toLowerCase();
-                    const username = tags['display-name'] || message.split('!')[0].substring(1);
-                    const timestamp = parseInt(tags['tmi-sent-ts'] || Date.now());
+                    // Parsowanie nazwy użytkownika
+                    const userStart = rawMessage.indexOf(':', 1);
+                    const userEnd = rawMessage.indexOf('!');
+                    const username = rawMessage.substring(userStart + 1, userEnd);
 
-                    if (timestamp <= giveaway.lastMessageTime) return;
-                    giveaway.lastMessageTime = timestamp;
+                    // Parsowanie treści wiadomości
+                    const msgStart = rawMessage.indexOf(':', rawMessage.indexOf('PRIVMSG'));
+                    const messageText = rawMessage.substring(msgStart + 1).trim().toLowerCase();
 
+                    // Parsowanie ID wiadomości
+                    const msgId = tags['id'] || '0';
+                    
+                    // Sprawdzanie czy to nowa wiadomość
+                    if (parseInt(msgId) <= giveaway.lastMessageId) return;
+                    giveaway.lastMessageId = parseInt(msgId);
+
+                    // Sprawdzanie komendy
                     if (messageText === giveaway.chatCommand) {
+                        // Pobieranie danych subskrypcji
                         const subMonths = parseInt(tags['badge-info']?.match(/subscriber\/(\d+)/)?.[1]) || 0;
                         const isSubscriber = tags['subscriber'] === '1';
 
                         let qualifies = false;
                         
+                        // Logika weryfikacji
                         switch(giveaway.requirement) {
                             case 'all':
                                 qualifies = true;
                                 break;
                             case '3':
-                                qualifies = subMonths >= 3;
+                                qualifies = subMonths >= 3 || (isSubscriber && subMonths === 0);
                                 break;
                             case '6':
                                 qualifies = subMonths >= 6;
@@ -165,13 +181,13 @@ class TwitchGiveaway {
                         }
                     }
                 } catch (e) {
-                    console.error('Error parsing message:', e);
+                    console.error('Błąd parsowania wiadomości:', e);
                 }
             }
         };
 
         socket.onerror = (error) => {
-            console.error('Chat error:', error);
+            console.error('Błąd połączenia czatu:', error);
         };
 
         this.chatConnection = socket;
@@ -213,7 +229,6 @@ class TwitchGiveaway {
         this.elements.activeGiveaways.innerHTML = '';
         this.elements.completedGiveaways.innerHTML = '';
 
-        // Przycisk czyszczenia
         if (this.giveaways.some(g => !g.isActive)) {
             const clearBtn = document.createElement('button');
             clearBtn.className = 'danger-btn';
