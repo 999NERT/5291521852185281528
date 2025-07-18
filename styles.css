@@ -282,20 +282,3 @@ textarea {
         padding: 10px;
     }
 }
-/* Styl dla przycisku czyszczenia */
-.completed-clear-btn {
-    background-color: #ff4500;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 20px;
-    display: block;
-    width: 100%;
-    text-align: center;
-}
-
-.completed-clear-btn:hover {
-    background-color: #ff6347;
-}
