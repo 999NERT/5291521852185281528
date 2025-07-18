@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Subscriber Giveaways</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>Twitch Subscriber Giveaways</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="create">Nowe losowanie</div>
+            <div class="tab" data-tab="active">Aktywne losowania</div>
+            <div class="tab" data-tab="completed">Zakończone</div>
+        </div>
+        
+        <div id="create-tab" class="tab-content active">
+            <div class="container">
+                <h2>Konfiguracja losowania</h2>
+                <div class="form-group">
+                    <label for="giveaway-name">Nazwa losowania:</label>
+                    <input type="text" id="giveaway-name" placeholder="Np. Klucz do gry XYZ">
+                </div>
+                
+                <div class="form-group">
+                    <label for="giveaway-description">Opis nagrody:</label>
+                    <textarea id="giveaway-description" rows="3" placeholder="Opisz nagrodę"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="giveaway-duration">Czas trwania (minuty):</label>
+                    <input type="number" id="giveaway-duration" min="1" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label>Wymagania dla uczestników:</label>
+                    <div class="requirements-grid">
+                        <button class="req-btn" data-req="all">Wszyscy w czacie</button>
+                        <button class="req-btn" data-req="3">
+                            <img src="icons/3.png" alt="3 months"> Sub 3+
+                        </button>
+                        <button class="req-btn" data-req="6">
+                            <img src="icons/6.png" alt="6 months"> Sub 6+
+                        </button>
+                        <button class="req-btn" data-req="9">
+                            <img src="icons/9.png" alt="9 months"> Sub 9+
+                        </button>
+                        <button class="req-btn" data-req="12">
+                            <img src="icons/12.png" alt="12 months"> Sub 12+
+                        </button>
+                        <button class="req-btn" data-req="18">
+                            <img src="icons/18.png" alt="18 months"> Sub 18+
+                        </button>
+                        <button class="req-btn" data-req="24">
+                            <img src="icons/24.png" alt="24 months"> Sub 24+
+                        </button>
+                    </div>
+                    <input type="hidden" id="selected-requirement" value="all">
+                </div>
+                
+                <div class="form-group">
+                    <label for="chat-url">URL czatu Twitch (popout):</label>
+                    <input type="text" id="chat-url" placeholder="https://www.twitch.tv/popout/nick/chat?popout=">
+                    <small>Upewnij się, że czat jest widoczny i załadowany</small>
+                </div>
+                
+                <button id="start-giveaway" class="primary-btn">Rozpocznij losowanie</button>
+            </div>
+        </div>
+        
+        <div id="active-tab" class="tab-content">
+            <div class="container">
+                <h2>Aktywne losowania</h2>
+                <div id="active-giveaways">
+                    <!-- Tutaj będą dodawane aktywne losowania -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="completed-tab" class="tab-content">
+            <div class="container">
+                <h2>Zakończone losowania</h2>
+                <div id="completed-giveaways">
+                    <!-- Tutaj będą dodawane zakończone losowania -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
