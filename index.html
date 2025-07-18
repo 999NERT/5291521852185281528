@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitch Subscriber Giveaways</title>
     <link rel="stylesheet" href="styles.css">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://api.ivr.fi; script-src 'self'">
 </head>
 <body>
     <div class="app-container">
-        <h1>4Twitch Subscriber Giveaways</h1>
+        <h1>Twitch Subscriber Giveaways</h1>
         
         <div class="tab-container">
             <div class="tab active" data-tab="create">Nowe losowanie</div>
@@ -39,38 +38,24 @@
                     <label>Wymagania subskrypcji:</label>
                     <div class="requirements-grid">
                         <button class="req-btn active" data-req="all">Wszyscy</button>
-                        <button class="req-btn" data-req="3">
-                            <img src="icons/3.png" alt="3 months"> Sub 3+
-                        </button>
-                        <button class="req-btn" data-req="6">
-                            <img src="icons/6.png" alt="6 months"> Sub 6+
-                        </button>
-                        <button class="req-btn" data-req="9">
-                            <img src="icons/9.png" alt="9 months"> Sub 9+
-                        </button>
-                        <button class="req-btn" data-req="12">
-                            <img src="icons/12.png" alt="12 months"> Sub 12+
-                        </button>
-                        <button class="req-btn" data-req="18">
-                            <img src="icons/18.png" alt="18 months"> Sub 18+
-                        </button>
-                        <button class="req-btn" data-req="24">
-                            <img src="icons/24.png" alt="24 months"> Sub 24+
-                        </button>
+                        <button class="req-btn" data-req="3">Sub 3+</button>
+                        <button class="req-btn" data-req="6">Sub 6+</button>
+                        <button class="req-btn" data-req="9">Sub 9+</button>
+                        <button class="req-btn" data-req="12">Sub 12+</button>
+                        <button class="req-btn" data-req="18">Sub 18+</button>
+                        <button class="req-btn" data-req="24">Sub 24+</button>
                     </div>
                     <input type="hidden" id="selected-requirement" value="all">
                 </div>
                 
                 <div class="form-group">
                     <label for="chat-command">Wymagana komenda w czacie:</label>
-                    <input type="text" id="chat-command" placeholder="Np. !24h">
-                    <small>Użytkownik musi wpisać dokładnie tę komendę</small>
+                    <input type="text" id="chat-command" placeholder="Np. !22h">
                 </div>
                 
                 <div class="form-group">
-                    <label for="chat-url">URL czatu Twitch (popout):</label>
-                    <input type="text" id="chat-url" placeholder="https://www.twitch.tv/popout/nick/chat?popout=">
-                    <small>Upewnij się, że czat jest widoczny i załadowany</small>
+                    <label for="chat-url">Nazwa kanału Twitch:</label>
+                    <input type="text" id="chat-url" placeholder="np. angelkacs">
                 </div>
                 
                 <button id="start-giveaway" class="primary-btn">Rozpocznij losowanie</button>
