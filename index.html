@@ -35,9 +35,9 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Wymagania dla uczestników:</label>
+                    <label>Wymagania subskrypcji:</label>
                     <div class="requirements-grid">
-                        <button class="req-btn" data-req="all">Wszyscy w czacie</button>
+                        <button class="req-btn" data-req="all">Wszyscy</button>
                         <button class="req-btn" data-req="3">
                             <img src="icons/3.png" alt="3 months"> Sub 3+
                         </button>
@@ -61,6 +61,12 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="chat-command">Wymagana komenda w czacie:</label>
+                    <input type="text" id="chat-command" placeholder="Np. !24h">
+                    <small>Użytkownik musi wpisać dokładnie tę komendę</small>
+                </div>
+                
+                <div class="form-group">
                     <label for="chat-url">URL czatu Twitch (popout):</label>
                     <input type="text" id="chat-url" placeholder="https://www.twitch.tv/popout/nick/chat?popout=">
                     <small>Upewnij się, że czat jest widoczny i załadowany</small>
@@ -74,7 +80,7 @@
             <div class="container">
                 <h2>Aktywne losowania</h2>
                 <div id="active-giveaways">
-                    <!-- Tutaj będą dodawane aktywne losowania -->
+                    <!-- Aktywne losowania będą dodawane tutaj -->
                 </div>
             </div>
         </div>
@@ -83,7 +89,7 @@
             <div class="container">
                 <h2>Zakończone losowania</h2>
                 <div id="completed-giveaways">
-                    <!-- Tutaj będą dodawane zakończone losowania -->
+                    <!-- Zakończone losowania będą dodawane tutaj -->
                 </div>
             </div>
         </div>
