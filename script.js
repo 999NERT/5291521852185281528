@@ -10,6 +10,7 @@ class TwitchGiveaway {
         this.setupEventListeners();
         this.renderGiveaways();
         this.startTimerUpdates();
+        this.setDefaultRequirement();
     }
     
     cacheElements() {
@@ -43,6 +44,11 @@ class TwitchGiveaway {
         this.elements.tabs.forEach(tab => {
             tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
         });
+    }
+    
+    setDefaultRequirement() {
+        const defaultBtn = document.querySelector('.req-btn[data-req="all"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
     }
     
     startNewGiveaway() {
@@ -113,7 +119,7 @@ class TwitchGiveaway {
             }
             
             this.checkChatForParticipants(giveawayId);
-        }, 3000); // Sprawdzaj co 3 sekundy
+        }, 3000);
     }
     
     checkChatForParticipants(giveawayId) {
@@ -129,14 +135,14 @@ class TwitchGiveaway {
             iframe.onload = () => {
                 try {
                     const chatDoc = iframe.contentDocument || iframe.contentWindow.document;
-                    const chatLines = chatDoc.querySelectorAll('.chat-line__message');
+                    const chatLines = chatDoc.querySelectorAll('[data-a-target="chat-line-message"]');
                     
                     chatLines.forEach(line => {
                         const timestamp = line.getAttribute('data-timestamp');
                         if (timestamp && giveaway.lastChecked && parseInt(timestamp) <= giveaway.lastChecked) return;
                         
                         // Pobierz nazwę użytkownika
-                        const usernameElement = line.querySelector('.chat-author__display-name');
+                        const usernameElement = line.querySelector('[data-a-user]');
                         if (!usernameElement) return;
                         const username = usernameElement.textContent.trim();
                         
@@ -174,7 +180,7 @@ class TwitchGiveaway {
     checkMessage(line, requiredCommand) {
         if (!requiredCommand) return true;
         
-        const messageContainer = line.querySelector('.text-fragment, .message');
+        const messageContainer = line.querySelector('[data-a-target="chat-message-text"]');
         if (!messageContainer) return false;
         
         const message = messageContainer.textContent.trim();
@@ -184,17 +190,17 @@ class TwitchGiveaway {
     checkSubscription(line, requirement) {
         if (requirement === 'all') return true;
         
-        const badges = line.querySelectorAll('.chat-badge');
+        const badges = line.querySelectorAll('[data-a-target="chat-badge"] img');
         const requiredMonths = parseInt(requirement);
         
-        return Array.from(badges).some(badge => {
-            const img = badge.querySelector('img');
-            if (!img) return false;
-            
-            // Sprawdź czy src obrazka zawiera wymagany czas subskrypcji
+        return Array.from(badges).some(img => {
             const src = img.src.toLowerCase();
-            const monthMatches = src.match(/(\d+)\.(png|webp|svg)/i);
             
+            // Sprawdź czy to odznaka subskrypcji
+            if (!src.includes('subscriber')) return false;
+            
+            // Sprawdź długość subskrypcji
+            const monthMatches = src.match(/(\d+)/);
             if (monthMatches && monthMatches[1]) {
                 const userSubMonths = parseInt(monthMatches[1]);
                 return userSubMonths >= requiredMonths;
