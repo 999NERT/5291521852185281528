@@ -25,7 +25,11 @@ class TwitchGiveaway {
             giveawayDescription: document.getElementById('giveaway-description'),
             giveawayDuration: document.getElementById('giveaway-duration'),
             chatCommand: document.getElementById('chat-command'),
-            chatUrl: document.getElementById('chat-url')
+            chatUrl: document.getElementById('chat-url'),
+            caseAnimation: document.querySelector('.case-animation'),
+            caseElement: document.querySelector('.case'),
+            winnerName: document.querySelector('.winner-name'),
+            caseCloseBtn: document.querySelector('.case-close-btn')
         };
     }
 
@@ -42,6 +46,11 @@ class TwitchGiveaway {
         
         this.elements.tabs.forEach(tab => {
             tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+        });
+
+        this.elements.caseCloseBtn.addEventListener('click', () => {
+            this.elements.caseAnimation.classList.remove('active');
+            this.elements.caseElement.classList.remove('open');
         });
     }
 
@@ -110,10 +119,8 @@ class TwitchGiveaway {
                 return;
             }
 
-            // Nowe, dokładne parsowanie wiadomości
             if (rawMessage.includes('PRIVMSG')) {
                 try {
-                    // Parsowanie tagów
                     const tagsStart = rawMessage.indexOf('@');
                     const tagsEnd = rawMessage.indexOf(' ');
                     const tagsStr = rawMessage.substring(tagsStart + 1, tagsEnd);
@@ -123,31 +130,24 @@ class TwitchGiveaway {
                         tags[key] = value;
                     });
 
-                    // Parsowanie nazwy użytkownika
                     const userStart = rawMessage.indexOf(':', 1);
                     const userEnd = rawMessage.indexOf('!');
                     const username = rawMessage.substring(userStart + 1, userEnd);
 
-                    // Parsowanie treści wiadomości
                     const msgStart = rawMessage.indexOf(':', rawMessage.indexOf('PRIVMSG'));
                     const messageText = rawMessage.substring(msgStart + 1).trim().toLowerCase();
 
-                    // Parsowanie ID wiadomości
                     const msgId = tags['id'] || '0';
                     
-                    // Sprawdzanie czy to nowa wiadomość
                     if (parseInt(msgId) <= giveaway.lastMessageId) return;
                     giveaway.lastMessageId = parseInt(msgId);
 
-                    // Sprawdzanie komendy
                     if (messageText === giveaway.chatCommand) {
-                        // Pobieranie danych subskrypcji
                         const subMonths = parseInt(tags['badge-info']?.match(/subscriber\/(\d+)/)?.[1]) || 0;
                         const isSubscriber = tags['subscriber'] === '1';
 
                         let qualifies = false;
                         
-                        // Logika weryfikacji
                         switch(giveaway.requirement) {
                             case 'all':
                                 qualifies = true;
@@ -203,18 +203,39 @@ class TwitchGiveaway {
         }
 
         if (giveaway.participants.length > 0) {
-            giveaway.winner = giveaway.participants[
-                Math.floor(Math.random() * giveaway.participants.length)
-            ];
+            const weightedParticipants = this.createWeightedParticipantsArray(giveaway.participants);
+            const randomIndex = Math.floor(Math.random() * weightedParticipants.length);
+            giveaway.winner = weightedParticipants[randomIndex];
+            
+            this.showCaseAnimation(giveaway.winner);
         }
 
         giveaway.isActive = false;
         this.saveGiveaways();
         this.renderGiveaways();
+    }
 
-        alert(giveaway.winner 
-            ? `Zwycięzca: ${giveaway.winner}` 
-            : 'Brak kwalifikujących się uczestników');
+    createWeightedParticipantsArray(participants) {
+        const weightedArray = [];
+        const totalParticipants = participants.length;
+        
+        participants.forEach((participant, index) => {
+            const weight = Math.ceil((totalParticipants - index) / 2);
+            for (let i = 0; i < weight; i++) {
+                weightedArray.push(participant);
+            }
+        });
+        
+        return weightedArray;
+    }
+
+    showCaseAnimation(winner) {
+        this.elements.winnerName.textContent = winner;
+        this.elements.caseAnimation.classList.add('active');
+        
+        setTimeout(() => {
+            this.elements.caseElement.classList.add('open');
+        }, 500);
     }
 
     clearCompletedGiveaways() {
