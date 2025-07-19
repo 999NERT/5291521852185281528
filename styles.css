@@ -31,7 +31,198 @@ h1 {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ... (reszta istniejących styli pozostaje bez zmian) ... */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #a970ff;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #3a3a3d;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #1f1f23;
+    color: #efeff1;
+    font-family: inherit;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.req-btn {
+    background-color: #26262c;
+    color: #efeff1;
+    border: none;
+    padding: 12px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.req-btn:hover {
+    background-color: #3a3a3d;
+}
+
+.req-btn.active {
+    background-color: #9147ff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.primary-btn {
+    background-color: #9147ff;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.primary-btn:hover {
+    background-color: #772ce8;
+}
+
+.danger-btn {
+    background-color: #e91916;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.danger-btn:hover {
+    background-color: #ff3333;
+}
+
+.tab-container {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #26262c;
+    padding-bottom: 5px;
+}
+
+.tab {
+    padding: 12px 20px;
+    background-color: #26262c;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.tab:hover {
+    background-color: #3a3a3d;
+}
+
+.tab.active {
+    background-color: #9147ff;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.giveaway-item {
+    border: 1px solid #26262c;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #1f1f23;
+    transition: all 0.2s;
+}
+
+.giveaway-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.winner {
+    font-weight: bold;
+    color: #00b5ad;
+    margin-top: 15px;
+    font-size: 1.2em;
+    padding: 10px;
+    background-color: rgba(0, 181, 173, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.requirements {
+    margin: 15px 0;
+    font-size: 0.95em;
+    color: #adadb8;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.participants-count {
+    color: #a970ff;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00b5ad;
+    margin: 10px 0;
+}
+
+.command-indicator {
+    display: inline-block;
+    background-color: #9147ff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-left: 5px;
+    font-family: monospace;
+}
+
+.participant-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+    background-color: #1f1f23;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #26262c;
+}
 
 /* Nowa animacja wyboru zwycięzcy */
 .winner-animation {
@@ -163,13 +354,24 @@ h1 {
     transform: scale(1.05);
 }
 
-@keyframes slowDown {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(var(--final-position)); }
-}
-
-/* Responsywność */
 @media (max-width: 768px) {
+    .app-container {
+        padding: 15px;
+    }
+    
+    .requirements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+    
+    .tab {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .giveaway-item {
+        padding: 15px;
+    }
+    
     .animation-container {
         width: 95%;
         height: 200px;
@@ -191,6 +393,19 @@ h1 {
 }
 
 @media (max-width: 480px) {
+    .requirements-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .tab {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    input, textarea, select {
+        padding: 10px;
+    }
+    
     .animation-container {
         height: 150px;
     }
