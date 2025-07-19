@@ -106,22 +106,6 @@ textarea {
     background-color: #772ce8;
 }
 
-.secondary-btn {
-    background-color: #3a3a3d;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-    margin-right: 10px;
-}
-
-.secondary-btn:hover {
-    background-color: #4a4a4d;
-}
-
 .danger-btn {
     background-color: #e91916;
     color: white;
@@ -240,13 +224,146 @@ textarea {
     border: 1px solid #26262c;
 }
 
-.participant-item {
-    padding: 5px 0;
-    border-bottom: 1px solid #26262c;
+/* Animacja skrzynki CS:GO */
+.case-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
 }
 
-.participant-item:last-child {
-    border-bottom: none;
+.case-animation.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.case {
+    width: 300px;
+    height: 200px;
+    background: linear-gradient(135deg, #3a3a3d 0%, #1f1f23 100%);
+    border: 3px solid #9147ff;
+    border-radius: 10px;
+    position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    box-shadow: 0 0 30px rgba(145, 71, 255, 0.5);
+}
+
+.case-lid {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(135deg, #4a4a4d 0%, #2a2a2e 100%);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    transform-origin: bottom center;
+    transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backface-visibility: hidden;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(145, 71, 255, 0.8);
+}
+
+.case.open .case-lid {
+    transform: rotateX(-160deg);
+}
+
+.case-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
+    z-index: 1;
+}
+
+.winner-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    margin-top: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-out 1s;
+}
+
+.case.open .winner-name {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.case-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(145, 71, 255, 0);
+    transition: box-shadow 0.5s;
+}
+
+.case.open .case-glow {
+    box-shadow: 0 0 50px rgba(145, 71, 255, 0.8);
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 30px rgba(145, 71, 255, 0.8);
+    }
+    to {
+        box-shadow: 0 0 60px rgba(145, 71, 255, 1);
+    }
+}
+
+.case-close-btn {
+    margin-top: 30px;
+    padding: 10px 20px;
+    background-color: #9147ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.case-close-btn:hover {
+    background-color: #772ce8;
+    transform: scale(1.05);
+}
+
+.rarity {
+    font-size: 1.5rem;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-out 0.7s;
+}
+
+.case.open .rarity {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
@@ -266,6 +383,11 @@ textarea {
     .giveaway-item {
         padding: 15px;
     }
+    
+    .case {
+        width: 250px;
+        height: 170px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -280,5 +402,18 @@ textarea {
     
     input, textarea, select {
         padding: 10px;
+    }
+    
+    .case {
+        width: 200px;
+        height: 140px;
+    }
+    
+    .winner-name {
+        font-size: 1.5rem;
+    }
+    
+    .rarity {
+        font-size: 1.2rem;
     }
 }
