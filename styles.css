@@ -29,7 +29,6 @@ h1 {
     margin-bottom: 20px;
     border: 1px solid #26262c;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    outline: 1px solid #9147ff;
 }
 
 .form-group {
@@ -54,7 +53,6 @@ input, textarea, select {
     font-family: inherit;
     font-size: 16px;
     margin-bottom: 5px;
-    outline: 1px solid #9147ff;
 }
 
 textarea {
@@ -78,7 +76,6 @@ textarea {
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
-    outline: 1px solid #9147ff;
 }
 
 .req-btn:hover {
@@ -89,7 +86,6 @@ textarea {
     background-color: #9147ff;
     color: white;
     transform: translateY(-2px);
-    outline: 1px solid #a970ff;
 }
 
 .primary-btn {
@@ -104,7 +100,6 @@ textarea {
     transition: background-color 0.2s;
     width: 100%;
     margin-top: 10px;
-    outline: 1px solid #a970ff;
 }
 
 .primary-btn:hover {
@@ -120,7 +115,6 @@ textarea {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
-    outline: 1px solid #ff3333;
 }
 
 .danger-btn:hover {
@@ -142,7 +136,6 @@ textarea {
     margin-right: 5px;
     transition: all 0.2s;
     font-weight: 500;
-    outline: 1px solid #9147ff;
 }
 
 .tab:hover {
@@ -152,7 +145,6 @@ textarea {
 .tab.active {
     background-color: #9147ff;
     color: white;
-    outline: 1px solid #a970ff;
 }
 
 .tab-content {
@@ -170,7 +162,6 @@ textarea {
     margin-bottom: 20px;
     background-color: #1f1f23;
     transition: all 0.2s;
-    outline: 1px solid #9147ff;
 }
 
 .giveaway-item:hover {
@@ -187,7 +178,6 @@ textarea {
     background-color: rgba(0, 181, 173, 0.1);
     border-radius: 4px;
     display: inline-block;
-    outline: 1px solid #00b5ad;
 }
 
 .requirements {
@@ -222,7 +212,6 @@ textarea {
     font-size: 0.85em;
     margin-left: 5px;
     font-family: monospace;
-    outline: 1px solid #a970ff;
 }
 
 .participant-list {
@@ -233,11 +222,10 @@ textarea {
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #26262c;
-    outline: 1px solid #9147ff;
 }
 
-/* Animacja wyboru zwycięzcy */
-.winner-animation {
+/* Animacja skrzynki CS:GO */
+.case-animation {
     position: fixed;
     top: 0;
     left: 0;
@@ -252,111 +240,102 @@ textarea {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s;
-    outline: 3px solid #9147ff;
-    box-shadow: 0 0 20px rgba(145, 71, 255, 0.7);
 }
 
-.winner-animation.active {
+.case-animation.active {
     opacity: 1;
     pointer-events: all;
 }
 
-.animation-container {
-    width: 90%;
-    max-width: 900px;
+.case {
+    width: 300px;
     height: 200px;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 30px;
-    outline: 2px solid #a970ff;
-    border-radius: 8px;
-}
-
-.center-line {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(to bottom, 
-        rgba(145, 71, 255, 0) 0%, 
-        rgba(145, 71, 255, 1) 50%, 
-        rgba(145, 71, 255, 0) 100%);
-    transform: translateX(-50%);
-    z-index: 2;
-}
-
-.participants-track {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    transition-timing-function: cubic-bezier(0.1, 0.8, 0.2, 1);
-}
-
-.participant-card {
-    min-width: 160px;
-    height: 80px;
-    margin: 0 15px;
     background: linear-gradient(135deg, #3a3a3d 0%, #1f1f23 100%);
-    border: 2px solid #26262c;
-    border-radius: 8px;
+    border: 3px solid #9147ff;
+    border-radius: 10px;
+    position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    box-shadow: 0 0 30px rgba(145, 71, 255, 0.5);
+}
+
+.case-lid {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(135deg, #4a4a4d 0%, #2a2a2e 100%);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    transform-origin: bottom center;
+    transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backface-visibility: hidden;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #fff;
     font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s;
-    outline: 2px solid transparent;
+    text-shadow: 0 0 10px rgba(145, 71, 255, 0.8);
 }
 
-.participant-card.highlighted {
-    border-color: #9147ff;
-    box-shadow: 0 0 25px rgba(145, 71, 255, 0.8);
-    transform: scale(1.15);
-    outline: 2px solid #a970ff;
+.case.open .case-lid {
+    transform: rotateX(-160deg);
+}
+
+.case-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
     z-index: 1;
 }
 
-.winner-result {
-    text-align: center;
+.winner-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    margin-top: 20px;
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.5s ease-out;
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(30, 30, 35, 0.8);
-    border-radius: 8px;
-    outline: 2px solid #9147ff;
+    transition: all 0.5s ease-out 1s;
 }
 
-.winner-animation.show-winner .winner-result {
+.case.open .winner-name {
     opacity: 1;
     transform: translateY(0);
 }
 
-.winner-name {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    margin-bottom: 10px;
+.case-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(145, 71, 255, 0);
+    transition: box-shadow 0.5s;
 }
 
-.winner-label {
-    font-size: 1.5rem;
-    color: #9147ff;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 20px;
+.case.open .case-glow {
+    box-shadow: 0 0 50px rgba(145, 71, 255, 0.8);
+    animation: pulse 1s infinite alternate;
 }
 
-.animation-close-btn {
-    padding: 12px 25px;
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 30px rgba(145, 71, 255, 0.8);
+    }
+    to {
+        box-shadow: 0 0 60px rgba(145, 71, 255, 1);
+    }
+}
+
+.case-close-btn {
+    margin-top: 30px;
+    padding: 10px 20px;
     background-color: #9147ff;
     color: white;
     border: none;
@@ -364,12 +343,27 @@ textarea {
     cursor: pointer;
     font-size: 1rem;
     transition: all 0.3s;
-    outline: 2px solid #a970ff;
 }
 
-.animation-close-btn:hover {
+.case-close-btn:hover {
     background-color: #772ce8;
     transform: scale(1.05);
+}
+
+.rarity {
+    font-size: 1.5rem;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-out 0.7s;
+}
+
+.case.open .rarity {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
@@ -390,22 +384,9 @@ textarea {
         padding: 15px;
     }
     
-    .animation-container {
-        height: 150px;
-    }
-    
-    .participant-card {
-        min-width: 120px;
-        height: 60px;
-        font-size: 1rem;
-    }
-    
-    .winner-name {
-        font-size: 1.8rem;
-    }
-    
-    .winner-label {
-        font-size: 1.2rem;
+    .case {
+        width: 250px;
+        height: 170px;
     }
 }
 
@@ -423,18 +404,16 @@ textarea {
         padding: 10px;
     }
     
-    .animation-container {
-        height: 120px;
-    }
-    
-    .participant-card {
-        min-width: 100px;
-        height: 50px;
-        font-size: 0.9rem;
-        margin: 0 10px;
+    .case {
+        width: 200px;
+        height: 140px;
     }
     
     .winner-name {
         font-size: 1.5rem;
+    }
+    
+    .rarity {
+        font-size: 1.2rem;
     }
 }
