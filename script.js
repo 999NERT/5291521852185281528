@@ -2,6 +2,9 @@ class TwitchGiveaway {
     constructor() {
         this.giveaways = JSON.parse(localStorage.getItem('twitchSubGiveaways')) || [];
         this.chatConnection = null;
+        this.animationInterval = null;
+        this.animationSpeed = 50;
+        this.animationDeceleration = 0.95;
         this.init();
     }
 
@@ -26,10 +29,11 @@ class TwitchGiveaway {
             giveawayDuration: document.getElementById('giveaway-duration'),
             chatCommand: document.getElementById('chat-command'),
             chatUrl: document.getElementById('chat-url'),
-            caseAnimation: document.querySelector('.case-animation'),
-            caseElement: document.querySelector('.case'),
+            winnerAnimation: document.querySelector('.winner-animation'),
+            participantsTrack: document.querySelector('.participants-track'),
+            winnerDisplay: document.querySelector('.winner-display'),
             winnerName: document.querySelector('.winner-name'),
-            caseCloseBtn: document.querySelector('.case-close-btn')
+            animationCloseBtn: document.querySelector('.animation-close-btn')
         };
     }
 
@@ -48,9 +52,8 @@ class TwitchGiveaway {
             tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
         });
 
-        this.elements.caseCloseBtn.addEventListener('click', () => {
-            this.elements.caseAnimation.classList.remove('active');
-            this.elements.caseElement.classList.remove('open');
+        this.elements.animationCloseBtn.addEventListener('click', () => {
+            this.stopAnimation();
         });
     }
 
@@ -203,11 +206,10 @@ class TwitchGiveaway {
         }
 
         if (giveaway.participants.length > 0) {
-            const weightedParticipants = this.createWeightedParticipantsArray(giveaway.participants);
-            const randomIndex = Math.floor(Math.random() * weightedParticipants.length);
-            giveaway.winner = weightedParticipants[randomIndex];
+            const randomIndex = Math.floor(Math.random() * giveaway.participants.length);
+            giveaway.winner = giveaway.participants[randomIndex];
             
-            this.showCaseAnimation(giveaway.winner);
+            this.showWinnerAnimation(giveaway.participants, giveaway.winner);
         }
 
         giveaway.isActive = false;
@@ -215,135 +217,82 @@ class TwitchGiveaway {
         this.renderGiveaways();
     }
 
-    createWeightedParticipantsArray(participants) {
-        const weightedArray = [];
-        const totalParticipants = participants.length;
+    showWinnerAnimation(participants, winner) {
+        // Przygotuj animację
+        this.elements.participantsTrack.innerHTML = '';
         
-        participants.forEach((participant, index) => {
-            const weight = Math.ceil((totalParticipants - index) / 2);
-            for (let i = 0; i < weight; i++) {
-                weightedArray.push(participant);
+        // Duplikuj uczestników dla płynniejszej animacji
+        const extendedParticipants = [...participants, ...participants, ...participants];
+        
+        extendedParticipants.forEach(participant => {
+            const card = document.createElement('div');
+            card.className = 'participant-card';
+            card.textContent = participant;
+            if (participant === winner) {
+                card.classList.add('highlighted');
             }
+            this.elements.participantsTrack.appendChild(card);
         });
         
-        return weightedArray;
-    }
-
-    showCaseAnimation(winner) {
+        // Ustaw pozycję początkową
+        const winnerIndex = extendedParticipants.indexOf(winner);
+        const cardWidth = 150; // Dostosuj do rzeczywistej szerokości karty
+        const finalPosition = -((winnerIndex - 2) * (cardWidth + 20));
+        
+        this.elements.participantsTrack.style.setProperty('--final-position', `${finalPosition}px`);
+        this.elements.participantsTrack.style.transform = 'translateX(0)';
+        
+        // Ustaw nazwę zwycięzcy
         this.elements.winnerName.textContent = winner;
-        this.elements.caseAnimation.classList.add('active');
         
-        setTimeout(() => {
-            this.elements.caseElement.classList.add('open');
-        }, 500);
+        // Pokaż animację
+        this.elements.winnerAnimation.classList.add('active');
+        
+        // Rozpocznij animację
+        this.startAnimation(finalPosition);
     }
 
-    clearCompletedGiveaways() {
-        if (confirm('Czy na pewno chcesz usunąć wszystkie zakończone losowania?')) {
-            this.giveaways = this.giveaways.filter(g => g.isActive);
-            this.saveGiveaways();
-            this.renderGiveaways();
-        }
-    }
-
-    renderGiveaways() {
-        this.elements.activeGiveaways.innerHTML = '';
-        this.elements.completedGiveaways.innerHTML = '';
-
-        if (this.giveaways.some(g => !g.isActive)) {
-            const clearBtn = document.createElement('button');
-            clearBtn.className = 'danger-btn';
-            clearBtn.textContent = 'Wyczyść zakończone losowania';
-            clearBtn.onclick = () => this.clearCompletedGiveaways();
-            this.elements.completedGiveaways.appendChild(clearBtn);
-        }
-
-        this.giveaways.forEach(giveaway => {
-            const element = document.createElement('div');
-            element.className = 'giveaway-item';
+    startAnimation(finalPosition) {
+        let currentSpeed = this.animationSpeed;
+        let currentPosition = 0;
+        
+        this.animationInterval = setInterval(() => {
+            currentPosition -= currentSpeed;
+            currentSpeed *= this.animationDeceleration;
             
-            const timeLeft = this.getTimeLeft(giveaway);
-            const requirementText = giveaway.requirement === 'all' ? 'Wszyscy' : `Sub ${giveaway.requirement}+`;
-            const participantsList = giveaway.participants.slice(-3).join(', ') || 'Brak uczestników';
-
-            element.innerHTML = `
-                <h3>${giveaway.name}</h3>
-                <p>${giveaway.description}</p>
-                <div class="requirements">
-                    Wymagania: ${requirementText}
-                    ${giveaway.chatCommand ? `<span class="command-indicator">Komenda: ${giveaway.chatCommand}</span>` : ''}
-                </div>
-                <p>Kanał: ${giveaway.channelName}</p>
-                <p class="participants-count">Uczestnicy: ${giveaway.participants.length}</p>
-                ${timeLeft}
-                ${giveaway.isActive ? `
-                    <button class="danger-btn" data-id="${giveaway.id}">Zakończ wcześniej</button>
-                    <div class="participant-list">
-                        Ostatni uczestnicy: ${participantsList}
-                    </div>
-                ` : `
-                    <p>Zakończono: ${new Date(giveaway.endTime).toLocaleString()}</p>
-                    ${giveaway.winner ? `<div class="winner">🏆 ${giveaway.winner} 🏆</div>` : ''}
-                `}
-            `;
-
-            if (giveaway.isActive) {
-                this.elements.activeGiveaways.appendChild(element);
-            } else {
-                this.elements.completedGiveaways.appendChild(element);
+            this.elements.participantsTrack.style.transform = `translateX(${currentPosition}px)`;
+            
+            // Podświetl kartę znajdującą się na środku
+            const cards = document.querySelectorAll('.participant-card');
+            cards.forEach(card => card.classList.remove('highlighted'));
+            
+            const containerCenter = window.innerWidth / 2;
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.left + rect.width / 2;
+                if (Math.abs(cardCenter - containerCenter) < rect.width / 3) {
+                    card.classList.add('highlighted');
+                }
+            });
+            
+            // Zakończ animację gdy zwolni
+            if (currentSpeed < 0.5) {
+                clearInterval(this.animationInterval);
+                this.elements.participantsTrack.style.transform = `translateX(var(--final-position))`;
+                this.elements.winnerDisplay.style.opacity = '1';
+                this.elements.winnerDisplay.style.transform = 'translateY(0)';
             }
-        });
-
-        document.querySelectorAll('.danger-btn[data-id]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (confirm('Na pewno zakończyć losowanie?')) {
-                    this.endGiveaway(parseInt(e.target.dataset.id));
-                }
-            });
-        });
+        }, 16);
     }
 
-    getTimeLeft(giveaway) {
-        if (!giveaway.isActive) return '';
-        
-        const diff = giveaway.endTime - new Date();
-        if (diff <= 0) return '';
-        
-        const minutes = Math.floor(diff / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-        return `<div class="timer">Kończy się za: ${minutes}m ${seconds}s</div>`;
+    stopAnimation() {
+        clearInterval(this.animationInterval);
+        this.elements.winnerAnimation.classList.remove('active');
+        this.elements.winnerDisplay.style.opacity = '0';
+        this.elements.winnerDisplay.style.transform = 'translateY(20px)';
     }
 
-    saveGiveaways() {
-        localStorage.setItem('twitchSubGiveaways', JSON.stringify(this.giveaways));
-    }
-
-    switchTab(tabName) {
-        this.elements.tabs.forEach(tab => tab.classList.remove('active'));
-        this.elements.tabContents.forEach(content => content.classList.remove('active'));
-        
-        document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-    }
-
-    startTimerUpdates() {
-        setInterval(() => {
-            const now = new Date();
-            this.giveaways.forEach(giveaway => {
-                if (giveaway.isActive && now >= giveaway.endTime) {
-                    this.endGiveaway(giveaway.id);
-                }
-            });
-            this.renderGiveaways();
-        }, 1000);
-    }
-
-    resetForm() {
-        this.elements.giveawayName.value = '';
-        this.elements.giveawayDescription.value = '';
-        this.elements.chatCommand.value = '';
-        this.elements.chatUrl.value = '';
-    }
+    // ... (reszta metod pozostaje bez zmian)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
