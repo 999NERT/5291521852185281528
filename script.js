@@ -218,7 +218,6 @@ class TwitchGiveaway {
     }
 
     showWinnerAnimation(participants, winner) {
-        // Przygotuj animację
         this.elements.participantsTrack.innerHTML = '';
         
         // Duplikuj uczestników dla płynniejszej animacji
@@ -292,7 +291,112 @@ class TwitchGiveaway {
         this.elements.winnerDisplay.style.transform = 'translateY(20px)';
     }
 
-    // ... (reszta metod pozostaje bez zmian)
+    clearCompletedGiveaways() {
+        if (confirm('Czy na pewno chcesz usunąć wszystkie zakończone losowania?')) {
+            this.giveaways = this.giveaways.filter(g => g.isActive);
+            this.saveGiveaways();
+            this.renderGiveaways();
+        }
+    }
+
+    renderGiveaways() {
+        this.elements.activeGiveaways.innerHTML = '';
+        this.elements.completedGiveaways.innerHTML = '';
+
+        if (this.giveaways.some(g => !g.isActive)) {
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'danger-btn';
+            clearBtn.textContent = 'Wyczyść zakończone losowania';
+            clearBtn.onclick = () => this.clearCompletedGiveaways();
+            this.elements.completedGiveaways.appendChild(clearBtn);
+        }
+
+        this.giveaways.forEach(giveaway => {
+            const element = document.createElement('div');
+            element.className = 'giveaway-item';
+            
+            const timeLeft = this.getTimeLeft(giveaway);
+            const requirementText = giveaway.requirement === 'all' ? 'Wszyscy' : `Sub ${giveaway.requirement}+`;
+            const participantsList = giveaway.participants.slice(-3).join(', ') || 'Brak uczestników';
+
+            element.innerHTML = `
+                <h3>${giveaway.name}</h3>
+                <p>${giveaway.description}</p>
+                <div class="requirements">
+                    Wymagania: ${requirementText}
+                    ${giveaway.chatCommand ? `<span class="command-indicator">Komenda: ${giveaway.chatCommand}</span>` : ''}
+                </div>
+                <p>Kanał: ${giveaway.channelName}</p>
+                <p class="participants-count">Uczestnicy: ${giveaway.participants.length}</p>
+                ${timeLeft}
+                ${giveaway.isActive ? `
+                    <button class="danger-btn" data-id="${giveaway.id}">Zakończ wcześniej</button>
+                    <div class="participant-list">
+                        Ostatni uczestnicy: ${participantsList}
+                    </div>
+                ` : `
+                    <p>Zakończono: ${new Date(giveaway.endTime).toLocaleString()}</p>
+                    ${giveaway.winner ? `<div class="winner">🏆 ${giveaway.winner} 🏆</div>` : ''}
+                `}
+            `;
+
+            if (giveaway.isActive) {
+                this.elements.activeGiveaways.appendChild(element);
+            } else {
+                this.elements.completedGiveaways.appendChild(element);
+            }
+        });
+
+        document.querySelectorAll('.danger-btn[data-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (confirm('Na pewno zakończyć losowanie?')) {
+                    this.endGiveaway(parseInt(e.target.dataset.id));
+                }
+            });
+        });
+    }
+
+    getTimeLeft(giveaway) {
+        if (!giveaway.isActive) return '';
+        
+        const diff = giveaway.endTime - new Date();
+        if (diff <= 0) return '';
+        
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        return `<div class="timer">Kończy się za: ${minutes}m ${seconds}s</div>`;
+    }
+
+    saveGiveaways() {
+        localStorage.setItem('twitchSubGiveaways', JSON.stringify(this.giveaways));
+    }
+
+    switchTab(tabName) {
+        this.elements.tabs.forEach(tab => tab.classList.remove('active'));
+        this.elements.tabContents.forEach(content => content.classList.remove('active'));
+        
+        document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    startTimerUpdates() {
+        setInterval(() => {
+            const now = new Date();
+            this.giveaways.forEach(giveaway => {
+                if (giveaway.isActive && now >= giveaway.endTime) {
+                    this.endGiveaway(giveaway.id);
+                }
+            });
+            this.renderGiveaways();
+        }, 1000);
+    }
+
+    resetForm() {
+        this.elements.giveawayName.value = '';
+        this.elements.giveawayDescription.value = '';
+        this.elements.chatCommand.value = '';
+        this.elements.chatUrl.value = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
