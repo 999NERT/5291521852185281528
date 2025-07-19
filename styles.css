@@ -294,18 +294,33 @@ textarea {
     z-index: 1;
 }
 
+.rarity {
+    font-size: 2rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-out 0.7s;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+}
+
 .winner-name {
     font-size: 2rem;
     font-weight: bold;
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    color: #90ee90;
+    text-shadow: 0 0 10px rgba(144, 238, 144, 0.5);
     margin-top: 20px;
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.5s ease-out 1s;
 }
 
-.case.open .winner-name {
+.case.open .winner-name,
+.case.open .rarity {
     opacity: 1;
     transform: translateY(0);
 }
@@ -348,22 +363,6 @@ textarea {
 .case-close-btn:hover {
     background-color: #772ce8;
     transform: scale(1.05);
-}
-
-.rarity {
-    font-size: 1.5rem;
-    color: #ffd700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease-out 0.7s;
-}
-
-.case.open .rarity {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
