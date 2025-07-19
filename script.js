@@ -2,9 +2,6 @@ class TwitchGiveaway {
     constructor() {
         this.giveaways = JSON.parse(localStorage.getItem('twitchSubGiveaways')) || [];
         this.chatConnection = null;
-        this.animationFrame = null;
-        this.animationSpeed = 100;
-        this.animationDeceleration = 0.98;
         this.init();
     }
 
@@ -29,12 +26,10 @@ class TwitchGiveaway {
             giveawayDuration: document.getElementById('giveaway-duration'),
             chatCommand: document.getElementById('chat-command'),
             chatUrl: document.getElementById('chat-url'),
-            winnerAnimation: document.querySelector('.winner-animation'),
-            participantsTrack: document.querySelector('.participants-track'),
+            caseAnimation: document.querySelector('.case-animation'),
+            caseElement: document.querySelector('.case'),
             winnerName: document.querySelector('.winner-name'),
-            winnerResult: document.querySelector('.winner-result'),
-            animationCloseBtn: document.querySelector('.animation-close-btn'),
-            animationContainer: document.querySelector('.animation-container')
+            caseCloseBtn: document.querySelector('.case-close-btn')
         };
     }
 
@@ -53,8 +48,9 @@ class TwitchGiveaway {
             tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
         });
 
-        this.elements.animationCloseBtn.addEventListener('click', () => {
-            this.stopAnimation();
+        this.elements.caseCloseBtn.addEventListener('click', () => {
+            this.elements.caseAnimation.classList.remove('active');
+            this.elements.caseElement.classList.remove('open');
         });
     }
 
@@ -207,10 +203,11 @@ class TwitchGiveaway {
         }
 
         if (giveaway.participants.length > 0) {
-            const randomIndex = Math.floor(Math.random() * giveaway.participants.length);
-            giveaway.winner = giveaway.participants[randomIndex];
+            const weightedParticipants = this.createWeightedParticipantsArray(giveaway.participants);
+            const randomIndex = Math.floor(Math.random() * weightedParticipants.length);
+            giveaway.winner = weightedParticipants[randomIndex];
             
-            this.showWinnerAnimation(giveaway.participants, giveaway.winner);
+            this.showCaseAnimation(giveaway.winner);
         }
 
         giveaway.isActive = false;
@@ -218,88 +215,27 @@ class TwitchGiveaway {
         this.renderGiveaways();
     }
 
-    showWinnerAnimation(participants, winner) {
-        this.elements.participantsTrack.innerHTML = '';
+    createWeightedParticipantsArray(participants) {
+        const weightedArray = [];
+        const totalParticipants = participants.length;
         
-        // Duplikuj uczestników dla płynniejszej animacji
-        const extendedParticipants = [...participants, ...participants, ...participants];
-        const winnerIndex = extendedParticipants.indexOf(winner);
-        
-        extendedParticipants.forEach((participant, index) => {
-            const card = document.createElement('div');
-            card.className = 'participant-card';
-            card.textContent = participant;
-            if (participant === winner && index === winnerIndex) {
-                card.dataset.winner = 'true';
+        participants.forEach((participant, index) => {
+            const weight = Math.ceil((totalParticipants - index) / 2);
+            for (let i = 0; i < weight; i++) {
+                weightedArray.push(participant);
             }
-            this.elements.participantsTrack.appendChild(card);
         });
         
+        return weightedArray;
+    }
+
+    showCaseAnimation(winner) {
         this.elements.winnerName.textContent = winner;
-        this.elements.winnerResult.style.opacity = '0';
-        this.elements.winnerAnimation.classList.add('active');
+        this.elements.caseAnimation.classList.add('active');
         
-        this.startAnimation(winnerIndex);
-    }
-
-    startAnimation(winnerIndex) {
-        const cardWidth = 160;
-        const cardMargin = 15;
-        const containerWidth = this.elements.animationContainer.offsetWidth;
-        const finalPosition = -(winnerIndex * (cardWidth + cardMargin)) + (containerWidth / 2) - (cardWidth / 2);
-        
-        let currentSpeed = this.animationSpeed;
-        let currentPosition = 0;
-        let lastTime = performance.now();
-
-        const animate = (timestamp) => {
-            const deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-            
-            if (currentSpeed > 0.5) {
-                currentPosition -= currentSpeed * (deltaTime / 16);
-                currentSpeed *= this.animationDeceleration;
-                
-                this.elements.participantsTrack.style.transform = `translateX(${currentPosition}px)`;
-                
-                // Podświetl kartę znajdującą się na środku
-                const cards = document.querySelectorAll('.participant-card');
-                cards.forEach(card => card.classList.remove('highlighted'));
-                
-                const containerCenter = containerWidth / 2;
-                cards.forEach(card => {
-                    const rect = card.getBoundingClientRect();
-                    const containerRect = this.elements.animationContainer.getBoundingClientRect();
-                    const cardCenter = rect.left + rect.width / 2 - containerRect.left;
-                    if (Math.abs(cardCenter - containerCenter) < 30) {
-                        card.classList.add('highlighted');
-                    }
-                });
-                
-                this.animationFrame = requestAnimationFrame(animate);
-            } else {
-                this.elements.participantsTrack.style.transform = `translateX(${finalPosition}px)`;
-                this.showWinner();
-            }
-        };
-        
-        this.animationFrame = requestAnimationFrame(animate);
-    }
-
-    showWinner() {
-        this.elements.winnerAnimation.classList.add('show-winner');
-        const winnerCard = document.querySelector('.participant-card[data-winner="true"]');
-        if (winnerCard) {
-            winnerCard.classList.add('highlighted');
-        }
-    }
-
-    stopAnimation() {
-        if (this.animationFrame) {
-            cancelAnimationFrame(this.animationFrame);
-        }
-        this.elements.winnerAnimation.classList.remove('active', 'show-winner');
-        this.elements.winnerResult.style.opacity = '0';
+        setTimeout(() => {
+            this.elements.caseElement.classList.add('open');
+        }, 500);
     }
 
     clearCompletedGiveaways() {
