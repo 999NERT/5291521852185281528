@@ -1,0 +1,4 @@
+Wszystkie wyrenderowane w 4k w plikach EXR 16bit
+
+OD 0.png - 10.png - Na silniku Unreal Egnine 5 wyrenderowane
+11.pnmg - Wyrenderoawne na blenderze 
